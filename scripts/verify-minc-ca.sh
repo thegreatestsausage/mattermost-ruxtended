@@ -28,7 +28,9 @@ fi
 # And, given an APK, the anchors actually survived into the artifact.
 if [ $# -ge 1 ]; then
   snippet=$(sed -n '2p' "$RAW/russian_trusted_root_ca.cer" | tr -d '\r' | cut -c1-40)
-  unzip -p "$1" 'res/*' 2>/dev/null | grep -qF "$snippet" || fail "no bundled root CA in $1"
+  # aapt2 renames res/raw files in release builds, so match on content, not on name.
+  # grep -c rather than -q: -q closes the pipe early and pipefail then fails the check.
+  unzip -p "$1" 'res/*' 2>/dev/null | grep -cF "$snippet" >/dev/null || fail "no bundled root CA in $1"
 fi
 
 echo "OK: anchors wired${1:+, present in $1}"
