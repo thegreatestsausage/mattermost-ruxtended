@@ -1,0 +1,42 @@
+diff --git a/node_modules/@mattermost/react-native-network-client/android/src/main/java/com/mattermost/networkclient/helpers/TrustManagerHelper.kt b/node_modules/@mattermost/react-native-network-client/android/src/main/java/com/mattermost/networkclient/helpers/TrustManagerHelper.kt
+index ac3cd63..c0455db 100644
+--- a/node_modules/@mattermost/react-native-network-client/android/src/main/java/com/mattermost/networkclient/helpers/TrustManagerHelper.kt
++++ b/node_modules/@mattermost/react-native-network-client/android/src/main/java/com/mattermost/networkclient/helpers/TrustManagerHelper.kt
+@@ -1,6 +1,5 @@
+ package com.mattermost.networkclient.helpers
+ 
+-import android.os.Build
+ import java.security.KeyStore
+ import javax.net.ssl.KeyManager
+ import javax.net.ssl.KeyManagerFactory
+@@ -10,22 +9,20 @@ import javax.net.ssl.X509TrustManager
+ object TrustManagerHelper {
+ 
+     /**
+-     * Builds an X509TrustManager that trusts both system and user-installed root CAs (#9337).
+-     * AndroidCAStore on API 24+ includes certificates installed via Settings → Security →
+-     * Install certificate (e.g. corporate CAs deployed by MDM).
++     * Builds an X509TrustManager from the platform default, which applies the app's
++     * network_security_config: system CAs, user-installed CAs (#9337), and any anchors
++     * bundled under res/raw.
++     *
++     * Passing an explicit AndroidCAStore here instead would replace that config wholesale --
++     * AOSP RootTrustManagerFactorySpi.engineInit() builds an ApplicationConfig from the given
++     * KeyStore rather than from the manifest -- so bundled anchors would never be consulted.
+      */
+     fun buildTrustManager(): X509TrustManager {
+         val trustManagerFactory = TrustManagerFactory.getInstance(
+             TrustManagerFactory.getDefaultAlgorithm()
+         )
+ 
+-        // AndroidCAStore on API 24+ includes both system and user-installed CAs.
+-        val keyStore = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+-            KeyStore.getInstance("AndroidCAStore").apply { load(null) }
+-        } else {
+-            null
+-        }
+-        trustManagerFactory.init(keyStore)
++        trustManagerFactory.init(null as KeyStore?)
+ 
+         return trustManagerFactory.trustManagers
+             .filterIsInstance<X509TrustManager>()

@@ -6,6 +6,10 @@
             <certificates src="system" />
             <!-- Additionally trust user added CAs -->
             <certificates src="user" />
+            <!-- Russian Ministry of Digital Development CAs, bundled so they are
+                 trusted by this app only and not installed device-wide -->
+            <certificates src="@raw/russian_trusted_root_ca" />
+            <certificates src="@raw/russian_trusted_sub_ca" />
         </trust-anchors>
     </base-config>
 </network-security-config>
