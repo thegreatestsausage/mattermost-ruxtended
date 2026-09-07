@@ -124,6 +124,8 @@ libraries/**/**/.build
 
 # Android sounds
 android/app/src/main/res/raw/*
+# except the bundled Ministry of Digital Development CAs
+!android/app/src/main/res/raw/russian_trusted_*.cer
 .aider*
 
 # Intune submodule (private repository - internal builds only)
