@@ -585,6 +585,11 @@ jest.mock('react-native-share', () => ({
     default: jest.fn(),
 }));
 
+jest.mock('react-native-webview', () => {
+    const {View} = require('react-native');
+    return {WebView: View, default: View};
+});
+
 jest.mock('@mattermost/react-native-emm', () => ({
     addListener: jest.fn(),
     authenticate: async () => {

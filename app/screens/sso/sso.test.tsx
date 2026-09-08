@@ -7,7 +7,7 @@ import LocalConfig from '@assets/config.json';
 import Preferences from '@constants/preferences';
 import {renderWithIntl} from '@test/intl-test-helper';
 
-import SSOAuthentication from './sso_authentication';
+import SSOAuthentication, {isNavigationAllowed} from './sso_authentication';
 
 jest.mock('@utils/url', () => {
     return {
@@ -94,5 +94,21 @@ describe('Server origin verification', () => {
         const serverUrl = 'https://legitimate.mattermost.com';
         const srvParam = 'https://legitimate.mattermost.com.attacker.com';
         expect(sanitizeUrl(serverUrl)).not.toBe(sanitizeUrl(srvParam));
+    });
+});
+
+describe('WebView navigation filtering', () => {
+    test('allows the http(s) login flow', () => {
+        expect(isNavigationAllowed('https://lunatech.tech/realms/x/protocol/saml')).toBe(true);
+        expect(isNavigationAllowed('http://example.com')).toBe(true);
+        expect(isNavigationAllowed('about:blank')).toBe(true);
+    });
+
+    test('blocks every other scheme, since originWhitelist no longer filters them', () => {
+        expect(isNavigationAllowed('mmauth://callback?MMAUTHTOKEN=t')).toBe(false);
+        expect(isNavigationAllowed('intent://evil#Intent;scheme=http;end')).toBe(false);
+        expect(isNavigationAllowed('file:///data/data/com.mattermost.rn/databases')).toBe(false);
+        // eslint-disable-next-line no-script-url
+        expect(isNavigationAllowed('javascript:alert(1)')).toBe(false);
     });
 });
