@@ -90,7 +90,7 @@
           <action android:name="android.intent.action.VIEW" />
           <category android:name="android.intent.category.DEFAULT" />
           <category android:name="android.intent.category.BROWSABLE" />
-          <data android:scheme="mmauthbeta" />
+          <data android:scheme="mmauth" />
         </intent-filter>
       </activity>
       <service android:name=".NotificationDismissService"
